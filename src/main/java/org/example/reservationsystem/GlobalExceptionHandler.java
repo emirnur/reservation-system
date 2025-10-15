@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -38,7 +39,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = {
             IllegalArgumentException.class,
-            IllegalStateException.class
+            IllegalStateException.class,
+            MethodArgumentNotValidException.class
     })
     public ResponseEntity<ErrorResponseDto> handleBadRequest(Exception e) {
         log.error("Handle handleBadRequest ", e);
