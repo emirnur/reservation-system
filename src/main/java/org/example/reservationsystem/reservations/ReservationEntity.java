@@ -1,4 +1,4 @@
-package org.example.reservationsystem;
+package org.example.reservationsystem.reservations;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

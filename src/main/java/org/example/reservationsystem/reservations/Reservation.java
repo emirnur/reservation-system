@@ -1,4 +1,4 @@
-package org.example.reservationsystem;
+package org.example.reservationsystem.reservations;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;

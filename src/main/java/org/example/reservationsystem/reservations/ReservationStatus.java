@@ -1,4 +1,4 @@
-package org.example.reservationsystem;
+package org.example.reservationsystem.reservations;
 
 public enum ReservationStatus {
     PENDING,
