@@ -3,11 +3,11 @@ package org.example.reservationsystem.reservations;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.reservationsystem.reservations.availability.ReservationAvailabilityService;
 import org.slf4j.Logger;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -17,6 +17,7 @@ public class ReservationService {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(ReservationService.class);
     private final ReservationRepository reservationRepository;
     private final ReservationMapper reservationMapper;
+    private final ReservationAvailabilityService reservationAvailabilityService;
 
     public Reservation getReservationById(Long id) {
         ReservationEntity reservationEntity = reservationRepository.findById(id).orElseThrow(
@@ -94,28 +95,17 @@ public class ReservationService {
             throw new IllegalStateException("Cannot modify reservation with id = " + id
                     + " status = " + reservationEntity.getStatus());
         }
-        var isConflict = isReservationConflict(
+        var isAvailableToApprove = reservationAvailabilityService.isReservationAvailable(
                 reservationEntity.getRoomId(),
                 reservationEntity.getStartDate(),
                 reservationEntity.getEndDate()
         );
-        if (isConflict) {
+        if (!isAvailableToApprove) {
             throw new IllegalStateException("Cannot approve reservation with id = " + id
                     + " because of conflict");
         }
         reservationEntity.setStatus(ReservationStatus.APPROVED);
         reservationRepository.save(reservationEntity);
         return reservationMapper.toDomain(reservationEntity);
-    }
-
-    private boolean isReservationConflict(Long roomId, LocalDate startDate, LocalDate endDate) {
-        List<Long> conflictReservationIds = reservationRepository.findConflictReservationIds(
-                roomId, startDate, endDate, ReservationStatus.APPROVED
-        );
-        if (conflictReservationIds.isEmpty()) {
-            return false;
-        }
-        log.info("Found conflict reservation ids: {}", conflictReservationIds);
-        return true;
     }
 }
